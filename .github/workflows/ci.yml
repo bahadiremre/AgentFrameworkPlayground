@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: the workflow only needs to read the repository.
+permissions:
+  contents: read
+
+# Cancel an older run when a newer commit is pushed to the same branch/PR.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and verify migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_DB: agentrag
+          POSTGRES_USER: agentrag
+          # Throwaway password for the CI-only database; not a real secret.
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agentrag -d agentrag"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      PROJECT: AgentFw/AgentFw/AgentFw.csproj
+      ConnectionStrings__AgentRag: Host=localhost;Port=5432;Database=agentrag;Username=agentrag;Password=ci-only-password
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore "$PROJECT"
+
+      - name: Build
+        run: dotnet build "$PROJECT" --configuration Release --no-restore
+
+      - name: Install dotnet-ef
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Check for missing migrations
+        run: dotnet ef migrations has-pending-model-changes --project "$PROJECT" --configuration Release --no-build
+
+      - name: Enable pgvector
+        run: psql "postgresql://agentrag:ci-only-password@localhost:5432/agentrag" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+      - name: Apply migrations to a fresh database
+        run: dotnet ef database update --project "$PROJECT" --configuration Release --no-build
