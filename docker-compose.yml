@@ -1,3 +1,6 @@
+# Fixed project name so volumes don't depend on the checkout folder name.
+name: agentframeworkplayground
+
 services:
   postgres:
     image: pgvector/pgvector:pg17
