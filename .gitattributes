@@ -1,0 +1,21 @@
+# Normalize line endings in the repository; check out with the OS default.
+* text=auto
+
+# Shell / container files must keep LF so they run inside Linux containers.
+*.sh text eol=lf
+*.sql text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+.env.example text eol=lf
+
+# Visual Studio files prefer CRLF.
+*.sln text eol=crlf
+*.slnx text eol=crlf
+*.csproj text eol=crlf
+
+# Binary files
+*.ico binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.pdf binary

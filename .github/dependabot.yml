@@ -1,0 +1,18 @@
+# Dependabot: weekly PRs for outdated / vulnerable dependencies.
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/AgentFw/AgentFw"
+    schedule:
+      interval: "weekly"
+    groups:
+      efcore:
+        patterns:
+          - "Microsoft.EntityFrameworkCore*"
+          - "Npgsql*"
+          - "EFCore.*"
+
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"

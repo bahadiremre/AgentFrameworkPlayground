@@ -1,0 +1,134 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* Todo */
+.todo-wrapper {
+  max-width: 640px;
+}
+
+.todo-check {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 2px solid var(--bs-secondary-border-subtle);
+  border-radius: 50%;
+  line-height: 1;
+  color: #fff;
+}
+
+.todo-check:hover {
+  border-color: var(--bs-success);
+}
+
+.todo-done .todo-check {
+  background-color: var(--bs-success);
+  border-color: var(--bs-success);
+}
+
+.todo-done .todo-title {
+  text-decoration: line-through;
+  color: var(--bs-secondary-color);
+}
+
+.todo-title {
+  word-break: break-word;
+}
+
+/* Chat panel */
+.chat-toggle {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  z-index: 1050;
+}
+
+.chat-panel {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 6rem;
+  width: 360px;
+  max-width: calc(100vw - 2rem);
+  height: 480px;
+  max-height: calc(100vh - 8rem);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-panel[hidden] {
+  display: none;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chat-msg {
+  max-width: 85%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-msg-bot {
+  align-self: flex-start;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.chat-msg-user {
+  align-self: flex-end;
+  background-color: var(--bs-primary);
+  color: #fff;
+}
+
+@media (max-width: 575.98px) {
+  .chat-toggle {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .chat-panel {
+    right: 1rem;
+    left: 1rem;
+    bottom: 5.5rem;
+    width: auto;
+  }
+}

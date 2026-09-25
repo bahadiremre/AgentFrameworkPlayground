@@ -1,0 +1,20 @@
+<button type="button" id="chat-toggle" class="chat-toggle btn btn-primary shadow"
+        aria-controls="chat-panel" aria-expanded="false" aria-label="Sohbeti aç">
+    💬
+</button>
+
+<section id="chat-panel" class="chat-panel card shadow" role="dialog" aria-label="Asistan" hidden>
+    <header class="card-header d-flex align-items-center justify-content-between">
+        <strong>Asistan</strong>
+        <button type="button" id="chat-close" class="btn-close" aria-label="Sohbeti kapat"></button>
+    </header>
+
+    <div id="chat-messages" class="chat-messages card-body" aria-live="polite">
+        <div class="chat-msg chat-msg-bot">Merhaba! Sana nasıl yardımcı olabilirim?</div>
+    </div>
+
+    <form id="chat-form" class="card-footer d-flex gap-2" autocomplete="off">
+        <input id="chat-input" class="form-control" placeholder="Mesaj yaz..." maxlength="2000" />
+        <button type="submit" class="btn btn-primary">Gönder</button>
+    </form>
+</section>
