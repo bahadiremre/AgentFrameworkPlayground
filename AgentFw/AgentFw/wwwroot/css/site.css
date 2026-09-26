@@ -68,6 +68,88 @@ body {
   max-width: 720px;
 }
 
+/* AI provider list */
+.providers-page {
+  max-width: 960px;
+}
+
+.providers-empty {
+  border: 2px dashed var(--bs-border-color);
+  background-color: var(--bs-tertiary-bg);
+}
+
+.provider-card {
+  border-color: var(--bs-border-color-translucent);
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+.provider-card:hover {
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.06);
+}
+
+/* Active provider: accent stripe instead of tinting the whole card. */
+.provider-card.is-active {
+  border-left: 4px solid var(--bs-success);
+}
+
+.provider-heading {
+  min-width: 0; /* lets the endpoint truncate inside the flex row */
+  flex: 1 1 18rem;
+}
+
+.provider-type {
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-secondary-color);
+  font-weight: 500;
+}
+
+.provider-status::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.3rem;
+  border-radius: 50%;
+  background-color: currentColor;
+  vertical-align: 0.05rem;
+}
+
+.provider-endpoint {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+}
+
+.provider-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem 1.5rem;
+  margin: 1rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bs-border-color-translucent);
+}
+
+/* No text-transform: uppercase. With lang="tr" it turns English words like "Embedding" into "EMBEDDİNG". */
+.provider-meta dt {
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--bs-secondary-color);
+}
+
+.provider-meta dd {
+  margin: 0;
+}
+
+.provider-value {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 0.375rem;
+  background-color: var(--bs-tertiary-bg);
+  font-family: var(--bs-font-monospace);
+  font-size: 0.85rem;
+}
+
 /* Chat panel */
 .chat-toggle {
   position: fixed;

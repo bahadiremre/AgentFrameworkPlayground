@@ -5,107 +5,116 @@
     ViewData["Title"] = "AI Sağlayıcıları";
 }
 
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <div>
-        <h1 class="h3 mb-1">AI Sağlayıcıları</h1>
-        <p class="text-muted small mb-0">Chatbot, <strong>aktif</strong> olarak işaretlenen sağlayıcıyı kullanır.</p>
+<div class="providers-page mx-auto">
+    <div class="d-flex align-items-end justify-content-between gap-3 flex-wrap mb-4">
+        <div>
+            <h1 class="h3 mb-1">AI Sağlayıcıları</h1>
+            <p class="text-muted mb-0">Chatbot, <strong>aktif</strong> olarak işaretlenen sağlayıcıyı kullanır.</p>
+        </div>
+        <a asp-page="Edit" class="btn btn-primary">+ Yeni sağlayıcı</a>
     </div>
-    <a asp-page="Edit" class="btn btn-primary">+ Yeni sağlayıcı</a>
-</div>
 
-@if (!string.IsNullOrEmpty(Model.StatusMessage))
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @Model.StatusMessage
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
-    </div>
-}
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Model.StatusMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+        </div>
+    }
 
-@if (Model.Providers.Count == 0)
-{
-    <div class="text-center text-muted border rounded p-5">
-        <p class="mb-3">Henüz bir AI sağlayıcısı eklenmedi.</p>
-        <a asp-page="Edit" class="btn btn-outline-primary">İlk sağlayıcıyı ekle</a>
-    </div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>Ad</th>
-                    <th>Tür</th>
-                    <th>Sohbet modeli</th>
-                    <th>Embedding modeli</th>
-                    <th>Kimlik doğrulama</th>
-                    <th class="text-end">İşlemler</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in Model.Providers)
-                {
-                    <tr class="@(p.IsActive ? "table-success" : "")">
-                        <td>
-                            <strong>@p.Name</strong>
-                            @if (p.IsActive)
-                            {
-                                <span class="badge text-bg-success ms-1">Aktif</span>
-                            }
-                            @if (!string.IsNullOrEmpty(p.Endpoint))
-                            {
-                                <div class="text-muted small text-break">@p.Endpoint</div>
-                            }
-                        </td>
-                        <td>@p.TypeDisplayName</td>
-                        <td><code>@p.ChatModel</code></td>
-                        <td>
-                            @if (string.IsNullOrEmpty(p.EmbeddingModel))
-                            {
-                                <span class="text-muted">—</span>
-                            }
-                            else
-                            {
-                                <code>@p.EmbeddingModel</code>
-                                @if (p.EmbeddingDimensions is not null)
+    @if (Model.Providers.Count == 0)
+    {
+        <div class="providers-empty text-center rounded-3 p-5">
+            <p class="h5 mb-2">Henüz bir AI sağlayıcısı yok</p>
+            <p class="text-muted mb-4">Azure AI Foundry, OpenAI veya Ollama gibi yerel bir sunucu ekleyerek başlayın.</p>
+            <a asp-page="Edit" class="btn btn-primary">İlk sağlayıcıyı ekle</a>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-3">
+            @foreach (var p in Model.Providers)
+            {
+                <article class="card provider-card @(p.IsActive ? "is-active" : "")" aria-label="@p.Name">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                            <div class="provider-heading">
+                                <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                    <h2 class="h5 mb-0">@p.Name</h2>
+                                    @if (p.IsActive)
+                                    {
+                                        <span class="badge rounded-pill text-bg-success provider-status">Aktif</span>
+                                    }
+                                    <span class="badge rounded-pill provider-type">@p.TypeDisplayName</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(p.Endpoint))
                                 {
-                                    <span class="text-muted small">(@p.EmbeddingDimensions)</span>
+                                    <div class="provider-endpoint text-truncate" title="@p.Endpoint">@p.Endpoint</div>
                                 }
-                            }
-                        </td>
-                        <td class="small">
-                            @if (p.AuthMode == AiAuthMode.EntraId)
-                            {
-                                <span>Entra ID</span>
-                            }
-                            else if (p.ApiKeyHint is not null)
-                            {
-                                <span>API anahtarı <code>@p.ApiKeyHint</code></span>
-                            }
-                            else
-                            {
-                                <span class="text-muted">Anahtarsız</span>
-                            }
-                        </td>
-                        <td class="text-end text-nowrap">
-                            @if (!p.IsActive)
-                            {
-                                <form method="post" asp-page-handler="Activate" asp-route-id="@p.Id" class="d-inline">
-                                    <button type="submit" class="btn btn-sm btn-outline-success">Aktif yap</button>
+                            </div>
+
+                            <div class="d-flex gap-2 flex-shrink-0">
+                                @if (!p.IsActive)
+                                {
+                                    <form method="post" asp-page-handler="Activate" asp-route-id="@p.Id">
+                                        <button type="submit" class="btn btn-sm btn-success">Aktif yap</button>
+                                    </form>
+                                }
+                                <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Düzenle</a>
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@p.Id"
+                                      data-confirm="&quot;@p.Name&quot; silinsin mi?">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
                                 </form>
-                            }
-                            <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Düzenle</a>
-                            <form method="post" asp-page-handler="Delete" asp-route-id="@p.Id" class="d-inline"
-                                  data-confirm="&quot;@p.Name&quot; silinsin mi?">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
+                            </div>
+                        </div>
+
+                        <dl class="provider-meta">
+                            <div>
+                                <dt>Sohbet modeli</dt>
+                                <dd><span class="provider-value">@p.ChatModel</span></dd>
+                            </div>
+                            <div>
+                                <dt>Embedding modeli</dt>
+                                <dd>
+                                    @if (string.IsNullOrEmpty(p.EmbeddingModel))
+                                    {
+                                        <span class="text-muted">Tanımlı değil</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="provider-value">@p.EmbeddingModel</span>
+                                        @if (p.EmbeddingDimensions is not null)
+                                        {
+                                            <span class="text-muted small ms-1">@p.EmbeddingDimensions boyut</span>
+                                        }
+                                    }
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>Kimlik doğrulama</dt>
+                                <dd>
+                                    @if (p.AuthMode == AiAuthMode.EntraId)
+                                    {
+                                        <span>Entra ID</span>
+                                    }
+                                    else if (p.ApiKeyHint is not null)
+                                    {
+                                        <span>API anahtarı</span>
+                                        <span class="provider-value ms-1">@p.ApiKeyHint</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Anahtarsız</span>
+                                    }
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</div>
 
 @section Scripts {
     <script>
