@@ -387,6 +387,6 @@ namespace AgentFw.Tests
             app.QueryAsync(db => db.AiProviders.AsNoTracking().OrderBy(p => p.Id).ToListAsync());
 
         private string Unprotect(string protectedKey) =>
-            app.Services.GetRequiredService<ApiKeyProtector>().Unprotect(protectedKey);
+            app.Services.GetRequiredService<IApiKeyProtector>().Unprotect(protectedKey);
     }
 }

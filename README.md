@@ -79,14 +79,26 @@ Or open `AgentFw/AgentFw.slnx` in Visual Studio and press **F5**. Pending EF Cor
 .
 ├── AgentFw/
 │   ├── AgentFw.slnx
+│   ├── AgentFw.Tests/           # Integration tests (xUnit, Testcontainers)
 │   └── AgentFw/                 # ASP.NET Core Razor Pages app
 │       ├── Data/                # EF Core DbContext, entities and migrations
-│       ├── Pages/               # Razor Pages (todo page, layout, chat panel)
+│       ├── Services/            # Business logic (AI provider service, definitions, key encryption)
+│       ├── Pages/               # Razor Pages (todo page, AI providers, layout, chat panel)
 │       └── wwwroot/             # Static files (CSS, JS, libraries)
 ├── db/init/                     # SQL scripts run on the first database start
 ├── docker-compose.yml           # PostgreSQL + pgvector
 └── .env.example                 # Template for database credentials
 ```
+
+## Adding an AI provider type
+
+Everything that differs between provider types lives in one class per type under `AgentFw/AgentFw/Services/AiProviders/` (for example `OpenAIDefinition.cs`): display name, whether the endpoint and API key are required, supported authentication modes and form hints. The form, validation and list page read these definitions, so a new type needs:
+
+1. A new value in the `AiProviderType` enum (`Data/AiProvider.cs`)
+2. A new `IAiProviderDefinition` class
+3. One registration line in `ServiceCollectionExtensions.AddAiProviders`
+
+A test fails if an enum value has no definition.
 
 ## Database migrations
 

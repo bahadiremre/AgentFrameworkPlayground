@@ -15,8 +15,7 @@ namespace AgentFw.Tests.Infrastructure
     /// </summary>
     public class AgentFwAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
-        private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder()
-            .WithImage("pgvector/pgvector:pg17")
+        private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder("pgvector/pgvector:pg17")
             .WithDatabase("agentrag")
             .WithUsername("agentrag")
             .WithPassword("test-only-password")

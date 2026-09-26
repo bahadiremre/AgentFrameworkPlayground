@@ -1,30 +1,15 @@
-using AgentFw.Data;
-using AgentFw.Services;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
+using AgentFw;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-
-// Encrypts stored API keys. A fixed application name keeps the key ring stable
-// even if the project folder is moved or renamed.
-builder.Services.AddDataProtection().SetApplicationName("AgentFrameworkPlayground");
-builder.Services.AddSingleton<ApiKeyProtector>();
-
-// Connection string lives in user secrets (ConnectionStrings:AgentRag), never in appsettings.
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("AgentRag"))
-           .UseSnakeCaseNamingConvention());
+builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddAiProviders();
 
 var app = builder.Build();
 
-// Apply pending EF Core migrations on startup.
-using (var scope = app.Services.CreateScope())
-{
-    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-}
+app.ApplyMigrations();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

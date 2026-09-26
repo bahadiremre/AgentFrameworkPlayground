@@ -6,7 +6,7 @@ namespace AgentFw.Services
     /// Encrypts AI provider API keys before they are written to the database.
     /// The Data Protection key ring lives in the user profile, outside the repo and the database.
     /// </summary>
-    public class ApiKeyProtector(IDataProtectionProvider provider)
+    public class ApiKeyProtector(IDataProtectionProvider provider) : IApiKeyProtector
     {
         private readonly IDataProtector _protector = provider.CreateProtector("AgentFw.AiProvider.ApiKey.v1");
 

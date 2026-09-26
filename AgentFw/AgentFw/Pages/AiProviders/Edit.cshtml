@@ -29,14 +29,24 @@
 
                 <div class="mb-3">
                     <label asp-for="Input.ProviderType" class="form-label"></label>
-                    <select asp-for="Input.ProviderType" asp-items="Html.GetEnumSelectList<AiProviderType>()" class="form-select"></select>
+                    @* Each option carries its type's rules so the script needs no per-type knowledge. *@
+                    <select asp-for="Input.ProviderType" class="form-select">
+                        @foreach (var d in Model.Definitions)
+                        {
+                            <option value="@d.Type"
+                                    data-endpoint="@d.Endpoint"
+                                    data-auth-modes="@string.Join(' ', d.SupportedAuthModes)"
+                                    data-key-required-modes="@string.Join(' ', d.SupportedAuthModes.Where(d.IsApiKeyRequired))">@d.DisplayName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.ProviderType" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3" data-show-for="AzureAIFoundry">
+                <div class="mb-3" data-auth-group>
                     <span class="form-label d-block">Kimlik doğrulama</span>
                     @foreach (var mode in Enum.GetValues<AiAuthMode>())
                     {
-                        <div class="form-check form-check-inline">
+                        <div class="form-check form-check-inline" data-auth-mode="@mode">
                             <input class="form-check-input" type="radio" asp-for="Input.AuthMode" value="@mode" id="auth-@mode" />
                             <label class="form-check-label" for="auth-@mode">@mode.GetDisplayName()</label>
                         </div>
@@ -48,22 +58,19 @@
 
                 <div class="mb-3">
                     <label asp-for="Input.Endpoint" class="form-label"></label>
+                    <span class="text-muted small" data-optional-endpoint>(isteğe bağlı)</span>
                     @* type="text": jQuery Validation's url rule rejects hosts without a TLD such as localhost. The server validates the URL. *@
                     <input asp-for="Input.Endpoint" class="form-control" type="text" inputmode="url" spellcheck="false" />
-                    <div class="form-text" data-show-for="AzureAIFoundry">
-                        Foundry portalında modelinizin <em>Endpoint</em> alanındaki adres, örn. <code>https://&lt;kaynak&gt;.openai.azure.com/</code>
-                    </div>
-                    <div class="form-text" data-show-for="OpenAI">
-                        İsteğe bağlı. Boş bırakırsanız <code>https://api.openai.com/v1</code> kullanılır.
-                    </div>
-                    <div class="form-text" data-show-for="OpenAICompatible">
-                        Örn. Ollama için <code>http://localhost:11434/v1</code>, LM Studio için <code>http://localhost:1234/v1</code>
-                    </div>
+                    @foreach (var d in Model.Definitions.Where(d => d.EndpointHintHtml is not null))
+                    {
+                        <div class="form-text" data-show-for="@d.Type">@Html.Raw(d.EndpointHintHtml)</div>
+                    }
                     <span asp-validation-for="Input.Endpoint" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-0" data-show-for-auth="ApiKey">
                     <label asp-for="Input.ApiKey" class="form-label"></label>
+                    <span class="text-muted small" data-optional-key>(isteğe bağlı)</span>
                     @if (Model.ExistingKeyHint is not null)
                     {
                         <span class="badge text-bg-light border ms-1">Kayıtlı: @Model.ExistingKeyHint</span>
@@ -72,7 +79,10 @@
                            placeholder="@(Model.ExistingKeyHint is null ? "" : "Değiştirmek için yeni anahtarı girin")" />
                     <div class="form-text">
                         Anahtar şifrelenerek saklanır ve bir daha gösterilmez.
-                        <span data-show-for="OpenAICompatible">Ollama gibi yerel sunucularda genelde gerekmez.</span>
+                        @foreach (var d in Model.Definitions.Where(d => d.ApiKeyHintHtml is not null))
+                        {
+                            <span data-show-for="@d.Type">@Html.Raw(d.ApiKeyHintHtml)</span>
+                        }
                     </div>
                     <span asp-validation-for="Input.ApiKey" class="text-danger small"></span>
 
@@ -93,8 +103,10 @@
                 <div class="mb-3">
                     <label asp-for="Input.ChatModel" class="form-label"></label>
                     <input asp-for="Input.ChatModel" class="form-control" placeholder="Örn. gpt-4o-mini" />
-                    <div class="form-text" data-show-for="AzureAIFoundry">Foundry'deki <strong>deployment adı</strong> (model adıyla aynı olmayabilir).</div>
-                    <div class="form-text" data-show-for="OpenAICompatible">Örn. Ollama'da <code>llama3.2</code></div>
+                    @foreach (var d in Model.Definitions.Where(d => d.ChatModelHintHtml is not null))
+                    {
+                        <div class="form-text" data-show-for="@d.Type">@Html.Raw(d.ChatModelHintHtml)</div>
+                    }
                     <span asp-validation-for="Input.ChatModel" class="text-danger small"></span>
                 </div>
 

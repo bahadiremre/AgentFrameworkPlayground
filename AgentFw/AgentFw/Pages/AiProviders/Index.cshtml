@@ -57,7 +57,7 @@ else
                                 <div class="text-muted small text-break">@p.Endpoint</div>
                             }
                         </td>
-                        <td>@p.ProviderType.GetDisplayName()</td>
+                        <td>@p.TypeDisplayName</td>
                         <td><code>@p.ChatModel</code></td>
                         <td>
                             @if (string.IsNullOrEmpty(p.EmbeddingModel))
@@ -74,7 +74,7 @@ else
                             }
                         </td>
                         <td class="small">
-                            @if (p.ProviderType == AiProviderType.AzureAIFoundry && p.AuthMode == AiAuthMode.EntraId)
+                            @if (p.AuthMode == AiAuthMode.EntraId)
                             {
                                 <span>Entra ID</span>
                             }

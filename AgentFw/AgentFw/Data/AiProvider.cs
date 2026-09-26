@@ -2,15 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AgentFw.Data
 {
+    // Display names and per-type rules live in Services/AiProviders/*Definition.cs.
     public enum AiProviderType
     {
-        [Display(Name = "Azure AI Foundry")]
         AzureAIFoundry,
-
-        [Display(Name = "OpenAI")]
         OpenAI,
-
-        [Display(Name = "OpenAI uyumlu (Ollama, LM Studio...)")]
         OpenAICompatible
     }
 
@@ -54,8 +50,9 @@ namespace AgentFw.Data
 
         public bool IsActive { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        // Set by AiProviderService through TimeProvider.
+        public DateTime CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; }
     }
 }
