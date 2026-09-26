@@ -104,6 +104,14 @@ Add-Migration <MigrationName> -OutputDir Data/Migrations
 
 The migration is applied the next time the app starts. To apply it without running the app, use `dotnet ef database update` or `Update-Database`.
 
+## Tests
+
+Integration tests in `AgentFw/AgentFw.Tests` run the real app in memory and drive it through HTTP, like a browser submitting forms. Each run starts a throwaway PostgreSQL + pgvector container with [Testcontainers](https://dotnet.testcontainers.org/), so Docker must be running. Your development database is not touched.
+
+```bash
+dotnet test AgentFw/AgentFw.slnx
+```
+
 ## Security notes
 
 - Secrets live in `.env` (for Docker) and user secrets (for the app). Both stay out of git.

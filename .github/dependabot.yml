@@ -2,7 +2,9 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/AgentFw/AgentFw"
+    directories:
+      - "/AgentFw/AgentFw"
+      - "/AgentFw/AgentFw.Tests"
     schedule:
       interval: "weekly"
     groups:
@@ -11,6 +13,15 @@ updates:
           - "Microsoft.EntityFrameworkCore*"
           - "Npgsql*"
           - "EFCore.*"
+      aspnetcore:
+        patterns:
+          - "Microsoft.AspNetCore.*"
+      test-tools:
+        patterns:
+          - "xunit*"
+          - "Microsoft.NET.Test.Sdk"
+          - "coverlet.*"
+          - "Testcontainers*"
 
   - package-ecosystem: "docker-compose"
     directory: "/"

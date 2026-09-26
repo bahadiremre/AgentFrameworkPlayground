@@ -71,3 +71,7 @@ jobs:
 
       - name: Apply migrations to a fresh database
         run: dotnet ef database update --project "$PROJECT" --configuration Release --no-build
+
+      # Integration tests start their own PostgreSQL container via Testcontainers.
+      - name: Test
+        run: dotnet test AgentFw/AgentFw.Tests/AgentFw.Tests.csproj --configuration Release

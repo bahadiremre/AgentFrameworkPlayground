@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="AgentFw.Tests/AgentFw.Tests.csproj" />
   <Project Path="AgentFw/AgentFw.csproj" />
 </Solution>
