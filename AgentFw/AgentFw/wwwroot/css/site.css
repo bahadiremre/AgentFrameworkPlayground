@@ -63,6 +63,11 @@ body {
   word-break: break-word;
 }
 
+/* AI provider form */
+.provider-form {
+  max-width: 720px;
+}
+
 /* Chat panel */
 .chat-toggle {
   position: fixed;

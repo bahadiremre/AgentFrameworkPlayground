@@ -1,0 +1,118 @@
+@page
+@model AgentFw.Pages.AiProviders.IndexModel
+@using AgentFw.Data
+@{
+    ViewData["Title"] = "AI Sağlayıcıları";
+}
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h1 class="h3 mb-1">AI Sağlayıcıları</h1>
+        <p class="text-muted small mb-0">Chatbot, <strong>aktif</strong> olarak işaretlenen sağlayıcıyı kullanır.</p>
+    </div>
+    <a asp-page="Edit" class="btn btn-primary">+ Yeni sağlayıcı</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Model.StatusMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+    </div>
+}
+
+@if (Model.Providers.Count == 0)
+{
+    <div class="text-center text-muted border rounded p-5">
+        <p class="mb-3">Henüz bir AI sağlayıcısı eklenmedi.</p>
+        <a asp-page="Edit" class="btn btn-outline-primary">İlk sağlayıcıyı ekle</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Ad</th>
+                    <th>Tür</th>
+                    <th>Sohbet modeli</th>
+                    <th>Embedding modeli</th>
+                    <th>Kimlik doğrulama</th>
+                    <th class="text-end">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Providers)
+                {
+                    <tr class="@(p.IsActive ? "table-success" : "")">
+                        <td>
+                            <strong>@p.Name</strong>
+                            @if (p.IsActive)
+                            {
+                                <span class="badge text-bg-success ms-1">Aktif</span>
+                            }
+                            @if (!string.IsNullOrEmpty(p.Endpoint))
+                            {
+                                <div class="text-muted small text-break">@p.Endpoint</div>
+                            }
+                        </td>
+                        <td>@p.ProviderType.GetDisplayName()</td>
+                        <td><code>@p.ChatModel</code></td>
+                        <td>
+                            @if (string.IsNullOrEmpty(p.EmbeddingModel))
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                            else
+                            {
+                                <code>@p.EmbeddingModel</code>
+                                @if (p.EmbeddingDimensions is not null)
+                                {
+                                    <span class="text-muted small">(@p.EmbeddingDimensions)</span>
+                                }
+                            }
+                        </td>
+                        <td class="small">
+                            @if (p.ProviderType == AiProviderType.AzureAIFoundry && p.AuthMode == AiAuthMode.EntraId)
+                            {
+                                <span>Entra ID</span>
+                            }
+                            else if (p.ApiKeyHint is not null)
+                            {
+                                <span>API anahtarı <code>@p.ApiKeyHint</code></span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Anahtarsız</span>
+                            }
+                        </td>
+                        <td class="text-end text-nowrap">
+                            @if (!p.IsActive)
+                            {
+                                <form method="post" asp-page-handler="Activate" asp-route-id="@p.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-success">Aktif yap</button>
+                                </form>
+                            }
+                            <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Düzenle</a>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@p.Id" class="d-inline"
+                                  data-confirm="&quot;@p.Name&quot; silinsin mi?">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('form[data-confirm]').forEach(form => {
+            form.addEventListener('submit', e => {
+                if (!confirm(form.dataset.confirm)) e.preventDefault();
+            });
+        });
+    </script>
+}

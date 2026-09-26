@@ -8,6 +8,7 @@ A hobby playground for building AI agents with **Microsoft Agent Framework** on 
 
 - **Todo list:** add, delete and mark items as done. Data is stored in PostgreSQL via EF Core.
 - **Chat panel:** a floating chat window in the bottom-right corner of every page. It currently returns a placeholder reply until the agent backend is connected.
+- **AI providers page:** store connection settings for Azure AI Foundry (API key or Entra ID), OpenAI and OpenAI-compatible servers such as Ollama or LM Studio. Several providers can be saved; one is marked active.
 - **Vector-ready database:** PostgreSQL 17 with the pgvector extension, running in Docker.
 
 ## Tech stack
@@ -107,6 +108,9 @@ The migration is applied the next time the app starts. To apply it without runni
 
 - Secrets live in `.env` (for Docker) and user secrets (for the app). Both stay out of git.
 - `.env.example` only contains placeholder values.
+- AI provider API keys entered in the app are encrypted with [ASP.NET Core Data Protection](https://learn.microsoft.com/aspnet/core/security/data-protection/introduction) before they reach the database. The encryption keys stay in your user profile, so a database dump alone does not reveal the API keys. The UI only ever shows the last four characters.
+- API keys are never sent over plain `http` to a non-local address.
+- The app has no login. It is meant to run on your own machine (`localhost`); don't expose it to a network as-is.
 - Dependabot checks NuGet packages and the Docker image weekly.
 
 ## Roadmap
@@ -114,6 +118,7 @@ The migration is applied the next time the app starts. To apply it without runni
 - [x] Todo list backed by PostgreSQL
 - [x] Chat panel UI
 - [x] PostgreSQL + pgvector in Docker
+- [x] AI providers page with encrypted API key storage
 - [ ] Connect the chat panel to an agent built with Microsoft Agent Framework and Azure AI Foundry
 - [ ] Document upload page
 - [ ] RAG: chunk documents, store embeddings in pgvector, answer questions from them

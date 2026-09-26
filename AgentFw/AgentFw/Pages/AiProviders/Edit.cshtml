@@ -1,0 +1,128 @@
+@page "{id:int?}"
+@model AgentFw.Pages.AiProviders.EditModel
+@using AgentFw.Data
+@{
+    ViewData["Title"] = Model.IsNew ? "Yeni AI sağlayıcısı" : "AI sağlayıcısını düzenle";
+}
+
+<div class="provider-form mx-auto">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-page="Index">AI Sağlayıcıları</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@(Model.IsNew ? "Yeni" : Model.Input.Name)</li>
+        </ol>
+    </nav>
+
+    <h1 class="h3 mb-3">@ViewData["Title"]</h1>
+
+    <form method="post" id="provider-form" autocomplete="off">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Bağlantı</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="Input.Name" class="form-label"></label>
+                    <input asp-for="Input.Name" class="form-control" placeholder="Örn. Foundry - gpt-4o-mini" />
+                    <span asp-validation-for="Input.Name" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.ProviderType" class="form-label"></label>
+                    <select asp-for="Input.ProviderType" asp-items="Html.GetEnumSelectList<AiProviderType>()" class="form-select"></select>
+                </div>
+
+                <div class="mb-3" data-show-for="AzureAIFoundry">
+                    <span class="form-label d-block">Kimlik doğrulama</span>
+                    @foreach (var mode in Enum.GetValues<AiAuthMode>())
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="Input.AuthMode" value="@mode" id="auth-@mode" />
+                            <label class="form-check-label" for="auth-@mode">@mode.GetDisplayName()</label>
+                        </div>
+                    }
+                    <div class="form-text" data-show-for-auth="EntraId">
+                        Anahtar gerekmez. Visual Studio'da veya <code>az login</code> ile giriş yaptığınız Azure hesabı kullanılır.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Endpoint" class="form-label"></label>
+                    @* type="text": jQuery Validation's url rule rejects hosts without a TLD such as localhost. The server validates the URL. *@
+                    <input asp-for="Input.Endpoint" class="form-control" type="text" inputmode="url" spellcheck="false" />
+                    <div class="form-text" data-show-for="AzureAIFoundry">
+                        Foundry portalında modelinizin <em>Endpoint</em> alanındaki adres, örn. <code>https://&lt;kaynak&gt;.openai.azure.com/</code>
+                    </div>
+                    <div class="form-text" data-show-for="OpenAI">
+                        İsteğe bağlı. Boş bırakırsanız <code>https://api.openai.com/v1</code> kullanılır.
+                    </div>
+                    <div class="form-text" data-show-for="OpenAICompatible">
+                        Örn. Ollama için <code>http://localhost:11434/v1</code>, LM Studio için <code>http://localhost:1234/v1</code>
+                    </div>
+                    <span asp-validation-for="Input.Endpoint" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-0" data-show-for-auth="ApiKey">
+                    <label asp-for="Input.ApiKey" class="form-label"></label>
+                    @if (Model.ExistingKeyHint is not null)
+                    {
+                        <span class="badge text-bg-light border ms-1">Kayıtlı: @Model.ExistingKeyHint</span>
+                    }
+                    <input asp-for="Input.ApiKey" class="form-control" autocomplete="new-password" spellcheck="false"
+                           placeholder="@(Model.ExistingKeyHint is null ? "" : "Değiştirmek için yeni anahtarı girin")" />
+                    <div class="form-text">
+                        Anahtar şifrelenerek saklanır ve bir daha gösterilmez.
+                        <span data-show-for="OpenAICompatible">Ollama gibi yerel sunucularda genelde gerekmez.</span>
+                    </div>
+                    <span asp-validation-for="Input.ApiKey" class="text-danger small"></span>
+
+                    @if (Model.ExistingKeyHint is not null)
+                    {
+                        <div class="form-check mt-2">
+                            <input asp-for="Input.RemoveApiKey" class="form-check-input" />
+                            <label asp-for="Input.RemoveApiKey" class="form-check-label"></label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Modeller</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label asp-for="Input.ChatModel" class="form-label"></label>
+                    <input asp-for="Input.ChatModel" class="form-control" placeholder="Örn. gpt-4o-mini" />
+                    <div class="form-text" data-show-for="AzureAIFoundry">Foundry'deki <strong>deployment adı</strong> (model adıyla aynı olmayabilir).</div>
+                    <div class="form-text" data-show-for="OpenAICompatible">Örn. Ollama'da <code>llama3.2</code></div>
+                    <span asp-validation-for="Input.ChatModel" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-sm-8">
+                        <label asp-for="Input.EmbeddingModel" class="form-label"></label>
+                        <input asp-for="Input.EmbeddingModel" class="form-control" placeholder="Örn. text-embedding-3-small" />
+                        <div class="form-text">İsteğe bağlı. Doküman araması (RAG) için gerekir.</div>
+                        <span asp-validation-for="Input.EmbeddingModel" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-4">
+                        <label asp-for="Input.EmbeddingDimensions" class="form-label"></label>
+                        <input asp-for="Input.EmbeddingDimensions" class="form-control" placeholder="1536" min="1" max="16000" />
+                        <div class="form-text"><code>text-embedding-3-small</code>: 1536</div>
+                        <span asp-validation-for="Input.EmbeddingDimensions" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/ai-provider-form.js" asp-append-version="true"></script>
+}

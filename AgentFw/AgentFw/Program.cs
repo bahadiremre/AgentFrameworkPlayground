@@ -1,10 +1,17 @@
 using AgentFw.Data;
+using AgentFw.Services;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// Encrypts stored API keys. A fixed application name keeps the key ring stable
+// even if the project folder is moved or renamed.
+builder.Services.AddDataProtection().SetApplicationName("AgentFrameworkPlayground");
+builder.Services.AddSingleton<ApiKeyProtector>();
 
 // Connection string lives in user secrets (ConnectionStrings:AgentRag), never in appsettings.
 builder.Services.AddDbContext<AppDbContext>(options =>
