@@ -22,7 +22,8 @@ namespace AgentFw.Pages
 
         public async Task<IActionResult> OnPostAddAsync()
         {
-            NewTitle = NewTitle.Trim();
+            // Model binding turns a whitespace-only value into null.
+            NewTitle = NewTitle?.Trim() ?? string.Empty;
             if (!ModelState.IsValid || NewTitle.Length == 0)
             {
                 await LoadTodosAsync();
